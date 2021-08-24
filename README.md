@@ -1,5 +1,5 @@
 # Scanner
-Scanner is a ...
+Scanner is a decentralized app that periodically runs the network smart contract to check the stability of the nodes and ensures the sustainability of the system.
 
 ## Installation
 
