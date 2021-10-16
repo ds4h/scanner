@@ -53,16 +53,16 @@ async function sendAlert(unreachableNode) {
 
     var mailOptions = {
         from: config.alertSenderGmail,
-        to: "example@gmail.com",
+        to: unreachableNode[5],
         subject: "A node is unreachable",
-        text: "The node with rpcURL: " + unreachableNode + " is unreachable",
+        text: "The node with rpcURL: " + unreachableNode[3] + " is unreachable",
     };
     transporter.sendMail(mailOptions, function (error, info) {
         if (error) {
             console.log(error);
         } else {
             console.log(
-                "Email sent: " + info.response + "   to" + unreachableNode
+                "Email sent: " + info.response + "   to" + unreachableNode[3]
             );
         }
     });
@@ -95,7 +95,7 @@ async function checkNodes() {
                 gas: "28387",
                 gasPrice: "0",
             });
-            unreachableNode = getNodesList[i][3];
+            unreachableNode = getNodesList[i];
             sendAlert(unreachableNode);
         }
         if (x == getNodesList.length) {
