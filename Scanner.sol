@@ -17,6 +17,7 @@ contract Scanner is AccessControl {
         string nodeURL;
         string rpcURL;
         string nodeName;
+        string email;
     }
 
     uint256 TotalNodesCount;
@@ -32,14 +33,16 @@ contract Scanner is AccessControl {
         string memory _ID,
         string memory _nodeURL,
         string memory _rpcURL,
-        string memory _nodeName
+        string memory _nodeName,
+        string memory _email
         ) public  {  require(hasRole(ADMIN, msg.sender));
             Node memory newNode = Node({     
                 nodeID: TotalNodesCount,
                 ID: _ID,
                 nodeURL: _nodeURL,    
                 rpcURL: _rpcURL,                         
-                nodeName: _nodeName
+                nodeName: _nodeName,
+                email: _email
             });
         
         NodesMap[TotalNodesCount] = newNode;  
