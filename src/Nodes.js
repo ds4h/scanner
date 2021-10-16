@@ -16,7 +16,7 @@ const address = config.contractAddress;
 const abi = Scanner;
 const contract = new web3.eth.Contract(abi, address);
 
-class Reports extends Component {
+class Nodes extends Component {
     async componentWillMount() {
         await this.loadWeb3();
         this.setState({ contract });
@@ -253,4 +253,4 @@ class Reports extends Component {
     }
 }
 
-export default Reports;
+export default Nodes;
