@@ -108,7 +108,7 @@ async function checkNodes() {
         }
     }
     if (x == 0) {
-        console.log("There is no nodes.");
+        console.log("There are no nodes.");
     }
 }
 
