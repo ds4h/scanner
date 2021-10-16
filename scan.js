@@ -1,5 +1,4 @@
 const Web3 = require("web3");
-const ethNetwork = "ws://138.68.76.192:23000";
 const Scanner = require("./src/abis/scanner.json");
 const config = require("./src/config.json");
 const axios = require("axios");
