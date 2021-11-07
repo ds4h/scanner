@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 contract Scanner is AccessControl {
     bytes32 public constant ADMIN = keccak256("ADMIN");
     event Unreachable(address indexed _controller, string  _nodeRPC, uint indexed _date);
-    uint tpsLimit = 100;
+    uint public tpsLimit = 100;
 
     constructor()  {
         _setupRole(ADMIN, msg.sender);
@@ -44,8 +44,8 @@ contract Scanner is AccessControl {
                 nodeURL: _nodeURL,    
                 rpcURL: _rpcURL,                         
                 nodeName: _nodeName,
-                email: _email
-                tps_Limit: tpsLimit;
+                email: _email,
+                tpsLimit: tpsLimit
             });
         
         NodesMap[TotalNodesCount] = newNode;  
