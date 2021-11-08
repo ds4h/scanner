@@ -1,6 +1,6 @@
 {
-    "WebsocketProvider": "ws://localhost:23000",
-    "contractAddress": "0xf716503601A7B2A1264e7c44c98bcB0A23944a6E",
+    "WebsocketProvider": "ws://159.65.206.56:23000",
+    "contractAddress": "0xFA9897A0849272869247FF2f862658553f12Fab2",
 
     "alertSenderGmail": "example@gmail.com",
     "alertSenderPassword": "example"

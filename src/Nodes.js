@@ -12,6 +12,8 @@ var rowColor = "";
 const web3 = new Web3(
     new Web3.providers.WebsocketProvider(config.WebsocketProvider)
 );
+
+
 const address = config.contractAddress;
 const abi = Scanner;
 const contract = new web3.eth.Contract(abi, address);
@@ -35,16 +37,54 @@ class Nodes extends Component {
             latestBlock: null,
             peerCount: null,
             gasPrice: null,
+            networkTPS: null,
+            acc1: null,
+            acc2: null,
+            acc3: null,
+            acc4: null
         };
     }
 
     async checkLatestBlock() {
+       
         const latestBlock = await web3.eth.getBlockNumber();
         const peerCount = await web3.eth.net.getPeerCount();
         const gasPrice = await web3.eth.getGasPrice();
+
+        const acc1 = await web3.eth.getTransactionCount("0xed9d02e382b34818e88b88a309c7fe71e65f419d");
+        const acc2 = await web3.eth.getTransactionCount("0xca843569e3427144cead5e4d5999a3d0ccf92b8e");
+        const acc3 = await web3.eth.getTransactionCount("0x0fbdc686b912d7722dc86510934589e0aaf3b55a");
+        const acc4 = await web3.eth.getTransactionCount("0x9186eb3d20cbd1f5f992a950d808c4495153abd5");
+
+        // TPS
+        const currentBlock = await web3.eth.getBlock("latest");
+        let result = null;
+        if (currentBlock.number !== null) { //only when block is mined not pending
+            const previousBlock = await web3.eth.getBlock(currentBlock.parentHash);
+            if(previousBlock.number !== null)
+                {
+            const timeTaken = currentBlock.timestamp - previousBlock.timestamp;
+            const transactionCount = currentBlock.transactions.length;
+            const tps = transactionCount / timeTaken;
+            result = tps;
+                }
+            }
+        
+
         this.setState({ latestBlock });
         this.setState({ peerCount: peerCount + 1 });
         this.setState({ gasPrice });
+        this.setState({networkTPS: result});
+        this.setState({ acc1 });
+        this.setState({ acc2 });
+        this.setState({ acc3 });
+        this.setState({ acc4 });
+
+        //this.setState({ acc });
+        console.log("Node1: " , acc1);
+        console.log("Node2: " , acc2);
+        console.log("Node3: " , acc3);
+        console.log("Node4: " , acc4);
     }
 
     async nodeStatus(rpcURL) {
@@ -215,6 +255,32 @@ class Nodes extends Component {
                                                     style={{ color: "blue" }}
                                                 >
                                                     {this.state.gasPrice}
+                                                </h1>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="col">
+                                <div
+                                    className="card border-light mb-3"
+                                    style={{ maxWidth: "420px" }}
+                                >
+                                    <div className="row g-0">
+                                        <div className="col-md-auto">
+                                            <i class="fas fa-fire fa-7x"></i>
+                                        </div>
+                                        <div className="col-md-auto">
+                                            <div className="card-body">
+                                                <h5 className="card-title">
+                                                    TPS
+                                                </h5>
+                                                <h1
+                                                    className="card-text"
+                                                    style={{ color: "blue" }}
+                                                >
+                                                    {this.state.networkTPS}
                                                 </h1>
                                             </div>
                                         </div>
