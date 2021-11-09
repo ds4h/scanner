@@ -7,12 +7,13 @@ import Scanner from "../src/abis/scanner.json";
 import config from "../src/config.json";
 import net from "net";
 const axios = require("axios");
+
 var statusVar = "";
 var rowColor = "";
+
 const web3 = new Web3(
     new Web3.providers.WebsocketProvider(config.WebsocketProvider)
 );
-
 
 const address = config.contractAddress;
 const abi = Scanner;
@@ -20,6 +21,7 @@ const contract = new web3.eth.Contract(abi, address);
 
 class Nodes extends Component {
     async componentWillMount() {
+        //await this.nodeX();
         await this.loadWeb3();
         this.setState({ contract });
         await this.getNodes();
@@ -38,53 +40,116 @@ class Nodes extends Component {
             peerCount: null,
             gasPrice: null,
             networkTPS: null,
-            acc1: null,
-            acc2: null,
-            acc3: null,
-            acc4: null
+            node1: null,
+            node2: null,
+            node3: null,
+            node4: null,
+            tps1: null,
+            tps2: null,
+            tps3: null,
+            tps4: null,
         };
+    }
+    async nodeX(rpcURL) {
+        const data = JSON.stringify({});
+        await axios
+            .post(rpcURL, {
+                jsonrpc: "2.0",
+                method: "admin_stopRPC",
+                params: null,
+            })
+            .then((res) => {
+                console.log(`statusCode: ${res.status}`);
+                console.log(res);
+                console.log("error");
+            })
+            .catch((error) => {
+                //console.error(error);
+                console.log("error");
+            });
     }
 
     async checkLatestBlock() {
-       
         const latestBlock = await web3.eth.getBlockNumber();
         const peerCount = await web3.eth.net.getPeerCount();
         const gasPrice = await web3.eth.getGasPrice();
 
-        const acc1 = await web3.eth.getTransactionCount("0xed9d02e382b34818e88b88a309c7fe71e65f419d");
-        const acc2 = await web3.eth.getTransactionCount("0xca843569e3427144cead5e4d5999a3d0ccf92b8e");
-        const acc3 = await web3.eth.getTransactionCount("0x0fbdc686b912d7722dc86510934589e0aaf3b55a");
-        const acc4 = await web3.eth.getTransactionCount("0x9186eb3d20cbd1f5f992a950d808c4495153abd5");
+        // TPS NODE
+        let node1 = await web3.eth.getTransactionCount(
+            "0x86e961c7b74f760fe5df0623f1bbd048c643f653"
+        );
+        let node2 = await web3.eth.getTransactionCount(
+            "0xa80ca1e0b974d7810f092b6601f7d4de746525ec"
+        );
+        let node3 = await web3.eth.getTransactionCount(
+            "0x00efc7770c70893b75df44d243a31506fbbd675f"
+        );
+        let node4 = await web3.eth.getTransactionCount(
+            "0x94d7bb7ef4cc5deb17ee7dc4305243526808bb4d"
+        );
+
+        if (node1 != this.state.node1) {
+            this.state.tps1 = node1 - this.state.node1;
+        } else {
+            this.state.tps1 = 0;
+        }
+        if (node2 != this.state.node2) {
+            this.state.tps2 = node2 - this.state.node2;
+        } else {
+            this.state.tps2 = 0;
+        }
+        if (node3 != this.state.node3) {
+            this.state.tps3 = node3 - this.state.node3;
+        } else {
+            this.state.tps3 = 0;
+        }
+        if (node4 != this.state.node4) {
+            this.state.tps4 = node4 - this.state.node4;
+        } else {
+            this.state.tps4 = 0;
+        }
+
+        this.setState({ node1 });
+        this.setState({ node2 });
+        this.setState({ node3 });
+        this.setState({ node4 });
+
+        console.log(this.state.tps1);
+        console.log(this.state.tps2);
+        console.log(this.state.tps3);
+        console.log(this.state.tps4);
 
         // TPS
         const currentBlock = await web3.eth.getBlock("latest");
         let result = null;
-        if (currentBlock.number !== null) { //only when block is mined not pending
-            const previousBlock = await web3.eth.getBlock(currentBlock.parentHash);
-            if(previousBlock.number !== null)
-                {
-            const timeTaken = currentBlock.timestamp - previousBlock.timestamp;
-            const transactionCount = currentBlock.transactions.length;
-            const tps = transactionCount / timeTaken;
-            result = tps;
-                }
+        if (currentBlock.number !== null) {
+            //only when block is mined not pending
+            const previousBlock = await web3.eth.getBlock(
+                currentBlock.parentHash
+            );
+            if (previousBlock.number !== null) {
+                const timeTaken =
+                    currentBlock.timestamp - previousBlock.timestamp;
+                const transactionCount = currentBlock.transactions.length;
+                const tps = transactionCount / timeTaken;
+                result = tps;
             }
-        
+        }
+
+        if (this.state.tps1 > 100) {
+            this.nodeX("http://127.0.0.1:22000");
+        } else if (this.state.tps2 > 100) {
+            this.nodeX("http://127.0.0.1:22001");
+        } else if (this.state.tps3 > 100) {
+            this.nodeX("http://127.0.0.1:22002");
+        } else if (this.state.tps4 > 100) {
+            this.nodeX("http://127.0.0.1:22003");
+        }
 
         this.setState({ latestBlock });
         this.setState({ peerCount: peerCount + 1 });
         this.setState({ gasPrice });
-        this.setState({networkTPS: result});
-        this.setState({ acc1 });
-        this.setState({ acc2 });
-        this.setState({ acc3 });
-        this.setState({ acc4 });
-
-        //this.setState({ acc });
-        console.log("Node1: " , acc1);
-        console.log("Node2: " , acc2);
-        console.log("Node3: " , acc3);
-        console.log("Node4: " , acc4);
+        this.setState({ networkTPS: result });
     }
 
     async nodeStatus(rpcURL) {

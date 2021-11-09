@@ -9,6 +9,7 @@ var net = require("net");
 const web3 = new Web3(
     new Web3.providers.WebsocketProvider(config.WebsocketProvider)
 );
+
 const address = config.contractAddress;
 const abi = Scanner;
 const contract = new web3.eth.Contract(abi, address);
