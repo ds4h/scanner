@@ -19,6 +19,11 @@ const address = config.contractAddress;
 const abi = Scanner;
 const contract = new web3.eth.Contract(abi, address);
 
+// Default value is 100
+var tpsLimit = await this.state.contract.methods
+            .getTpsLimit()
+            .call();
+
 class Nodes extends Component {
     async componentWillMount() {
         //await this.nodeX();
@@ -74,7 +79,7 @@ class Nodes extends Component {
         const peerCount = await web3.eth.net.getPeerCount();
         const gasPrice = await web3.eth.getGasPrice();
 
-        // TPS NODE
+        // Sender addresses for testing
         let node1 = await web3.eth.getTransactionCount(
             "0x86e961c7b74f760fe5df0623f1bbd048c643f653"
         );
@@ -136,13 +141,14 @@ class Nodes extends Component {
             }
         }
 
-        if (this.state.tps1 > 100) {
+        // Test network
+        if (this.state.tps1 > tpsLimit) {
             this.nodeX("http://127.0.0.1:22000");
-        } else if (this.state.tps2 > 100) {
+        } else if (this.state.tps2 > tpsLimit) {
             this.nodeX("http://127.0.0.1:22001");
-        } else if (this.state.tps3 > 100) {
+        } else if (this.state.tps3 > tpsLimit) {
             this.nodeX("http://127.0.0.1:22002");
-        } else if (this.state.tps4 > 100) {
+        } else if (this.state.tps4 > tpsLimit) {
             this.nodeX("http://127.0.0.1:22003");
         }
 
@@ -150,26 +156,6 @@ class Nodes extends Component {
         this.setState({ peerCount: peerCount + 1 });
         this.setState({ gasPrice });
         this.setState({ networkTPS: result });
-    }
-
-    async nodeStatus(rpcURL) {
-        await axios
-            .post(rpcURL, {
-                jsonrpc: "2.0",
-                method: "web3_clientVersion",
-                params: null,
-                id: 0,
-            })
-            .then((res) => {
-                //console.log(`statusCode: ${res.status}`);
-                //console.log(res.data.result);
-                statusVar = "up";
-            })
-            .catch((error) => {
-                //console.error(error);
-                //console.log("error");
-                statusVar = "down";
-            });
     }
 
     async getNodes() {

@@ -19,7 +19,7 @@ contract Scanner is AccessControl {
         string rpcURL;
         string nodeName;
         string email;
-        uint tpsLimit;
+        string senderAddress;
     }
 
     uint256 TotalNodesCount;
@@ -36,7 +36,8 @@ contract Scanner is AccessControl {
         string memory _nodeURL,
         string memory _rpcURL,
         string memory _nodeName,
-        string memory _email
+        string memory _email,
+        string memory _senderAddress
         ) public  {  require(hasRole(ADMIN, msg.sender));
             Node memory newNode = Node({     
                 nodeID: TotalNodesCount,
@@ -45,7 +46,7 @@ contract Scanner is AccessControl {
                 rpcURL: _rpcURL,                         
                 nodeName: _nodeName,
                 email: _email,
-                tpsLimit: tpsLimit
+                senderAddress: _senderAddress
             });
         
         NodesMap[TotalNodesCount] = newNode;  
@@ -99,6 +100,14 @@ contract Scanner is AccessControl {
 
     function getNodeCount() public view returns(uint256){
         return TotalNodesCount;
+    }
+    
+    function getTpsLimit() public view returns(uint){
+        return tpsLimit;
+    }
+    
+    function setTpsLimit(uint limit) public {
+        tpsLimit = limit;
     }
     
 }
