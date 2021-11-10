@@ -7,17 +7,26 @@ import Scanner from "../src/abis/scanner.json";
 import config from "../src/config.json";
 import net from "net";
 const axios = require("axios");
+
 var statusVar = "";
 var rowColor = "";
+
 const web3 = new Web3(
     new Web3.providers.WebsocketProvider(config.WebsocketProvider)
 );
+
 const address = config.contractAddress;
 const abi = Scanner;
 const contract = new web3.eth.Contract(abi, address);
 
+// Default value is 100
+var tpsLimit = await this.state.contract.methods
+            .getTpsLimit()
+            .call();
+
 class Nodes extends Component {
     async componentWillMount() {
+        //await this.nodeX();
         await this.loadWeb3();
         this.setState({ contract });
         await this.getNodes();
@@ -35,36 +44,118 @@ class Nodes extends Component {
             latestBlock: null,
             peerCount: null,
             gasPrice: null,
+            networkTPS: null,
+            node1: null,
+            node2: null,
+            node3: null,
+            node4: null,
+            tps1: null,
+            tps2: null,
+            tps3: null,
+            tps4: null,
         };
+    }
+    async nodeX(rpcURL) {
+        const data = JSON.stringify({});
+        await axios
+            .post(rpcURL, {
+                jsonrpc: "2.0",
+                method: "admin_stopRPC",
+                params: null,
+            })
+            .then((res) => {
+                console.log(`statusCode: ${res.status}`);
+                console.log(res);
+                console.log("error");
+            })
+            .catch((error) => {
+                //console.error(error);
+                console.log("error");
+            });
     }
 
     async checkLatestBlock() {
         const latestBlock = await web3.eth.getBlockNumber();
         const peerCount = await web3.eth.net.getPeerCount();
         const gasPrice = await web3.eth.getGasPrice();
+
+        // Sender addresses for testing
+        let node1 = await web3.eth.getTransactionCount(
+            "0x86e961c7b74f760fe5df0623f1bbd048c643f653"
+        );
+        let node2 = await web3.eth.getTransactionCount(
+            "0xa80ca1e0b974d7810f092b6601f7d4de746525ec"
+        );
+        let node3 = await web3.eth.getTransactionCount(
+            "0x00efc7770c70893b75df44d243a31506fbbd675f"
+        );
+        let node4 = await web3.eth.getTransactionCount(
+            "0x94d7bb7ef4cc5deb17ee7dc4305243526808bb4d"
+        );
+
+        if (node1 != this.state.node1) {
+            this.state.tps1 = node1 - this.state.node1;
+        } else {
+            this.state.tps1 = 0;
+        }
+        if (node2 != this.state.node2) {
+            this.state.tps2 = node2 - this.state.node2;
+        } else {
+            this.state.tps2 = 0;
+        }
+        if (node3 != this.state.node3) {
+            this.state.tps3 = node3 - this.state.node3;
+        } else {
+            this.state.tps3 = 0;
+        }
+        if (node4 != this.state.node4) {
+            this.state.tps4 = node4 - this.state.node4;
+        } else {
+            this.state.tps4 = 0;
+        }
+
+        this.setState({ node1 });
+        this.setState({ node2 });
+        this.setState({ node3 });
+        this.setState({ node4 });
+
+        console.log(this.state.tps1);
+        console.log(this.state.tps2);
+        console.log(this.state.tps3);
+        console.log(this.state.tps4);
+
+        // TPS
+        const currentBlock = await web3.eth.getBlock("latest");
+        let result = null;
+        if (currentBlock.number !== null) {
+            //only when block is mined not pending
+            const previousBlock = await web3.eth.getBlock(
+                currentBlock.parentHash
+            );
+            if (previousBlock.number !== null) {
+                const timeTaken =
+                    currentBlock.timestamp - previousBlock.timestamp;
+                const transactionCount = currentBlock.transactions.length;
+                const tps = transactionCount / timeTaken;
+                result = tps;
+            }
+        }
+
+        // Test network
+        if (this.state.tps1 > tpsLimit) {
+            this.nodeX("http://127.0.0.1:22000");
+        } else if (this.state.tps2 > tpsLimit) {
+            this.nodeX("http://127.0.0.1:22001");
+        } else if (this.state.tps3 > tpsLimit) {
+            this.nodeX("http://127.0.0.1:22002");
+        } else if (this.state.tps4 > tpsLimit) {
+            this.nodeX("http://127.0.0.1:22003");
+        }
+
         this.setState({ latestBlock });
         this.setState({ peerCount: peerCount + 1 });
         this.setState({ gasPrice });
-    }
-
-    async nodeStatus(rpcURL) {
-        await axios
-            .post(rpcURL, {
-                jsonrpc: "2.0",
-                method: "web3_clientVersion",
-                params: null,
-                id: 0,
-            })
-            .then((res) => {
-                //console.log(`statusCode: ${res.status}`);
-                //console.log(res.data.result);
-                statusVar = "up";
-            })
-            .catch((error) => {
-                //console.error(error);
-                //console.log("error");
-                statusVar = "down";
-            });
+        this.setState({ networkTPS: result });
     }
 
     async getNodes() {
@@ -215,6 +306,32 @@ class Nodes extends Component {
                                                     style={{ color: "blue" }}
                                                 >
                                                     {this.state.gasPrice}
+                                                </h1>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="col">
+                                <div
+                                    className="card border-light mb-3"
+                                    style={{ maxWidth: "420px" }}
+                                >
+                                    <div className="row g-0">
+                                        <div className="col-md-auto">
+                                            <i class="fas fa-fire fa-7x"></i>
+                                        </div>
+                                        <div className="col-md-auto">
+                                            <div className="card-body">
+                                                <h5 className="card-title">
+                                                    TPS
+                                                </h5>
+                                                <h1
+                                                    className="card-text"
+                                                    style={{ color: "blue" }}
+                                                >
+                                                    {this.state.networkTPS}
                                                 </h1>
                                             </div>
                                         </div>
