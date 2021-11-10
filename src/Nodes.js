@@ -320,7 +320,7 @@ class Nodes extends Component {
                                 >
                                     <div className="row g-0">
                                         <div className="col-md-auto">
-                                            <i class="fas fa-fire fa-7x"></i>
+                                            <i class="fas fa-tachometer-alt fa-7x"></i>
                                         </div>
                                         <div className="col-md-auto">
                                             <div className="card-body">
