@@ -19,10 +19,7 @@ const address = config.contractAddress;
 const abi = Scanner;
 const contract = new web3.eth.Contract(abi, address);
 
-// Default value is 100
-var tpsLimit = await this.state.contract.methods
-            .getTpsLimit()
-            .call();
+
 
 class Nodes extends Component {
     async componentWillMount() {
@@ -53,6 +50,7 @@ class Nodes extends Component {
             tps2: null,
             tps3: null,
             tps4: null,
+            tpsLimit: null
         };
     }
     async nodeX(rpcURL) {
@@ -142,13 +140,13 @@ class Nodes extends Component {
         }
 
         // Test network
-        if (this.state.tps1 > tpsLimit) {
+        if (this.state.tps1 > this.state.tpsLimit) {
             this.nodeX("http://127.0.0.1:22000");
-        } else if (this.state.tps2 > tpsLimit) {
+        } else if (this.state.tps2 > this.state.tpsLimit) {
             this.nodeX("http://127.0.0.1:22001");
-        } else if (this.state.tps3 > tpsLimit) {
+        } else if (this.state.tps3 > this.state.tpsLimit) {
             this.nodeX("http://127.0.0.1:22002");
-        } else if (this.state.tps4 > tpsLimit) {
+        } else if (this.state.tps4 > this.state.tpsLimit) {
             this.nodeX("http://127.0.0.1:22003");
         }
 
@@ -159,6 +157,11 @@ class Nodes extends Component {
     }
 
     async getNodes() {
+        // Default value is 100
+        var tpsLimit = await this.state.contract.methods
+            .getTpsLimit()
+            .call();
+        this.setState({ tpsLimit });
         var x = 0;
         var getNodesList = await this.state.contract.methods
             .getValidNodes()
